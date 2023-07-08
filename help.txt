@@ -1,0 +1,1 @@
+run "npm i md5" to get use it in app.js to generate hashes of password
