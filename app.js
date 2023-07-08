@@ -3,7 +3,8 @@ const express = require("express");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltrounds = 10;
 // Database Handling
 mongoose.connect(
   `mongodb+srv://Admin:S%40king10@cluster0.83b3qvq.mongodb.net/secrets?retryWrites=true&w=majority`,
@@ -47,8 +48,12 @@ app.get("/login", function (req, res) {
 });
 
 app.post("/register", function (req, res) {
-  CreateUser(req.body.username, md5(req.body.password)).then(function () {
-    res.redirect("/");
+  bcrypt.hash(req.body.password, saltrounds, function (err, hash) {
+    if (err) console.log(err);
+    else
+      CreateUser(req.body.username, hash).then(function () {
+        res.redirect("/");
+      });
   });
 });
 
@@ -57,8 +62,18 @@ app.post("/login", function (req, res) {
     if (!foundUser) {
       res.status(404);
     } else {
-      if (foundUser.password === md5(req.body.password)) res.render("secrets");
-      else res.status(404);
+      bcrypt.compare(
+        req.body.password,
+        foundUser.password,
+        function (err, result) {
+          if (err) console.log(err);
+          else {
+            if (result === true) {
+              res.render("secrets");
+            }
+          }
+        }
+      );
     }
   });
 });
