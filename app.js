@@ -36,6 +36,7 @@ mongoose.connect(
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
+  secrets: [String],
 });
 userSchema.plugin(passportMongoose);
 
@@ -44,6 +45,14 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// helper functions
+async function AddSecret(id, secret) {
+  const user = await User.updateOne(
+    { _id: id },
+    { $push: { secrets: secret } }
+  );
+  return user;
+}
 async function CreateUser(email, password) {
   await User.create({ email: email, password: password });
 }
@@ -105,6 +114,24 @@ app.get("/secrets", function (req, res) {
     res.redirect("/login");
   }
 });
+
+app.get("/submit", function (req, res) {
+  if (req.isAuthenticated()) {
+    res.render("submit");
+  } else res.redirect("/login");
+});
+app.post("/submit", function (req, res) {
+  const submittedSecret = req.body.secret;
+  console.log(req.user);
+  AddSecret(req.user.id, submittedSecret).then(function (err, found) {
+    if (err) console.log(err);
+    else {
+      console.log(found);
+      res.redirect("/secrets");
+    }
+  });
+});
+
 app.get("/logout", function (req, res) {
   req.logOut(function (err) {
     if (err) console.log(err);
