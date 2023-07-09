@@ -45,7 +45,7 @@ The repository mentioned in the readme contains additional branches that showcas
 
 3. `4_Salting`: Demonstrates the use of password salting, an additional security measure for password hashing.
 
-4. `5_Cookies_and_Session`: Introduces the use of cookies and sessions to enhance the user authentication process. This branch is live and hosted on [https://passpostauth.onrender.com/secrets](https://passpostauth.onrender.com/secrets) for reviewing purposes.
+4. `5_Cookies_and_Session`: Introduces the use of cookies and sessions to enhance the user authentication process. This branch is live and hosted on [https://passpostauth.onrender.com/secrets](https://passpostauth.onrender.com) for reviewing purposes.
 
 Each branch builds upon the previous one, incrementally improving the security of user authentication and data storage.
 
