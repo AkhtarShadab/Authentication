@@ -36,7 +36,7 @@ mongoose.connect(
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
-  secrets: [String],
+  secrets: String,
 });
 userSchema.plugin(passportMongoose);
 
@@ -47,17 +47,19 @@ passport.deserializeUser(User.deserializeUser());
 
 // helper functions
 async function AddSecret(id, secret) {
-  const user = await User.updateOne(
-    { _id: id },
-    { $push: { secrets: secret } }
-  );
+  const user = await User.updateOne({ _id: id }, { secrets: secret });
   return user;
 }
-async function CreateUser(email, password) {
-  await User.create({ email: email, password: password });
-}
-async function FindUser(email) {
-  const user = await User.findOne({ email: email });
+// async function CreateUser(email, password) {
+//   await User.create({ email: email, password: password });
+// }
+// async function FindUser(email) {
+//   const user = await User.findOne({ email: email });
+//   return user;
+// }
+
+async function FindSecretUser() {
+  const user = await User.find({ secrets: { $ne: null } });
   return user;
 }
 
@@ -108,11 +110,11 @@ app.post("/login", function (req, res) {
   });
 });
 app.get("/secrets", function (req, res) {
-  if (req.isAuthenticated()) {
-    res.render("secrets");
-  } else {
-    res.redirect("/login");
-  }
+  FindSecretUser().then(function (founduser) {
+    if (founduser) {
+      res.render("secrets", { usersWithSecrets: founduser });
+    }
+  });
 });
 
 app.get("/submit", function (req, res) {
@@ -122,14 +124,17 @@ app.get("/submit", function (req, res) {
 });
 app.post("/submit", function (req, res) {
   const submittedSecret = req.body.secret;
-  console.log(req.user);
-  AddSecret(req.user.id, submittedSecret).then(function (err, found) {
-    if (err) console.log(err);
-    else {
-      console.log(found);
-      res.redirect("/secrets");
-    }
-  });
+  const id = req.user.id;
+  if (req.isAuthenticated()) {
+    AddSecret(id, submittedSecret).then(function (updateres, err) {
+      if (err) console.log(err);
+      else {
+        res.redirect("/secrets");
+      }
+    });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/logout", function (req, res) {
