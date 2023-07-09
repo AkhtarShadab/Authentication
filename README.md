@@ -55,6 +55,6 @@ The app's source code and branches can be found on the GitHub repository at [`Au
 
 ## Live Demo
 
-For a live demonstration of the app with the latest security enhancements, you can visit [https://passpostauth.onrender.com/secrets](https://passpostauth.onrender.com/secrets).
+For a live demonstration of the app with the latest security enhancements, you can visit [https://passpostauth.onrender.com](https://passpostauth.onrender.com).
 
 Please note that this is a demo environment, and it may not be suitable for production use.
